@@ -269,9 +269,16 @@ Note that the interface should derive from **IActorEvents**:
     }
     ```
 
-2. Let **BuildingActor** implement **IActorEventPublisher<IBuildingActorEvents>**. This ensures that we can actually publish **IBuildingActorEvents** from the Building actor.
-	
-3. Change the **ReceiveReminderAsync** implementation to publish an event instead of writing the results to the log:
+2. Let the **IBuildingActor** interface implement **IActorEventPublisher<IBuildingActorEvents>**. This ensures that we can actually publish **IBuildingActorEvents** from the Building actor.
+
+	```
+	public interface IBuildingActor : IActor, IActorEventPublisher<IBuildingActorEvents>
+    {
+        Task ReportSensorStatusAsync(string sensorId, decimal averageReading);
+    }
+	```
+
+3. In **BuildingActor** change the **ReceiveReminderAsync** implementation to publish an event instead of writing the results to the log:
 
     ```
     public async Task ReceiveReminderAsync(string reminderName, byte[] context, TimeSpan dueTime, TimeSpan period)
