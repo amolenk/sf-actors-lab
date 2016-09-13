@@ -92,7 +92,7 @@ The **SensorActorState** class will keep track of the last 10 received readings.
     }
     ```
 
-9. You should now be able to build the solution. Note that the **SensorActor** service is automatically added to the service manifest (ApplicationPackageRoot\ServiceManifest.xml in the **ServiceFabricSensors** project).
+9. You should now be able to build the solution. Note that the **SensorActor** service is automatically added to the service manifest (*ApplicationPackageRoot\ServiceManifest.xml* in the **ServiceFabricSensors** project).
 
 ## Sending data to the Actor
 
@@ -169,7 +169,7 @@ This method simply saves the average reading of each sensor in the state manager
 3. Update the **IBuildingActor** interface:
 
     ```
-    public interface IBuildingActor : IActor, IActorEventPublisher<IBuildingActorEvents>
+    public interface IBuildingActor : IActor
     {
         Task ReportSensorStatusAsync(string sensorId, decimal averageReading);
     }
@@ -269,7 +269,9 @@ Note that the interface should derive from **IActorEvents**:
     }
     ```
 
-2. In **BuildingActor** change the **ReceiveReminderAsync** implementation to publish an event instead of writing the results to the log:
+2. Let **BuildingActor** implement **IActorEventPublisher<IBuildingActorEvents>**. This ensures that we can actually publish **IBuildingActorEvents** from the Building actor.
+	
+3. Change the **ReceiveReminderAsync** implementation to publish an event instead of writing the results to the log:
 
     ```
     public async Task ReceiveReminderAsync(string reminderName, byte[] context, TimeSpan dueTime, TimeSpan period)
@@ -293,9 +295,9 @@ Note that the interface should derive from **IActorEvents**:
     }
     ```
 
-3. Now the **ClientApp** must subscribe to the events. First add a reference to the **BuildingActor.Interfaces** project so that we can use the **IBuildingActorEvents** interface from the **ClientApp**.
+4. Now the **ClientApp** must subscribe to the events. First add a reference to the **BuildingActor.Interfaces** project so that we can use the **IBuildingActorEvents** interface from the **ClientApp**.
 
-4. Add a new **BuildingActorEventHandler** class to the **ClientApp** which will be responsible for handling the events.
+5. Add a new **BuildingActorEventHandler** class to the **ClientApp** which will be responsible for handling the events.
 This class implements the **IBuildingActorEvents** interface:
 
     ```
@@ -310,7 +312,7 @@ This class implements the **IBuildingActorEvents** interface:
     }
     ```
 
-5. In **Program.cs** add a new method to subscribe the handler to the building actor events.
+6. In **Program.cs** add a new method to subscribe the handler to the building actor events.
 Note that we catch **FabricExceptions** and retry because the Service Fabric application may not be started and ready yet when the **ClientApp** is started: 
 
     ```
@@ -339,7 +341,7 @@ Note that we catch **FabricExceptions** and retry because the Service Fabric app
     }
     ```
 
-6. Update the **Main** entry point to call the new method:
+7. Update the **Main** entry point to call the new method:
 
     ```
     static void Main(string[] args)
@@ -352,6 +354,6 @@ Note that we catch **FabricExceptions** and retry because the Service Fabric app
     }
     ```
 
-7. Start the solution. Every 5 seconds the aggregated readings will be outputted on the console.
+8. Start the solution. Every 5 seconds the aggregated readings will be outputted on the console.
 
 ### TODO Dummy data pushen via Web Sockets (oftwel, hoe kun je custom communicatie protocollen gebruiken in SF)
