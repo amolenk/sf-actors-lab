@@ -363,4 +363,3 @@ Note that we catch **FabricExceptions** and retry because the Service Fabric app
 
 8. Start the solution. Every 5 seconds the aggregated readings will be outputted on the console.
 
-### TODO Dummy data pushen via Web Sockets (oftwel, hoe kun je custom communicatie protocollen gebruiken in SF)
